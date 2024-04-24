@@ -46,7 +46,7 @@ const hashedPassword = await bcrypt.hash(password, 12)
               userID: result.id,
               email: result.email,
             },
-            'AIb6d35fvJM4O9pXqXQNla2jBCH9kuLz',
+            process.env.JWT_SECRET,
             {
               expiresIn: '1h',
             }
