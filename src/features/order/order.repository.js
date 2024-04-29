@@ -9,9 +9,10 @@ export default class OrderRepository{
     }
 
     async placeOrder(userId){
-        try{
         const client = getClient();
         const session = client.startSession();
+        try{
+        
         const db = getDB();
         session.startTransaction();
         // 1. Get cartitems and calculate total amount.
@@ -30,13 +31,17 @@ export default class OrderRepository{
                 {$inc:{stock: -item.quantity}},{session}
             )
         }
-        throw new Error("Something is wrong in placeOrder");
+        // throw new Error("Something is wrong in placeOrder");
         // 4. Clear the cart items.
         await db.collection("cartItems").deleteMany({
-            userId: new ObjectId(userId)
+            userID: new ObjectId(userId)
         },{session});
+        session.commitTransaction();
+        session.endSession();
         return;
         }catch(err){
+            await session.abortTransaction();
+            session.endSession();
             console.log(err);
             throw new ApplicationError("Something went wrong with database", 500);    
         }
